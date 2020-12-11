@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>Tag: Rasterization - Hexo</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Hexo"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Hexo"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta property="og:type" content="blog"><meta property="og:title" content="Hexo"><meta property="og:url" content="http://k-zha14.github.io/"><meta property="og:site_name" content="Hexo"><meta property="og:locale" content="en_US"><meta property="og:image" content="http://k-zha14.github.io/img/og_image.png"><meta property="article:author" content="Kai Zhao"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://k-zha14.github.io"},"headline":"Hexo","image":["http://k-zha14.github.io/img/og_image.png"],"author":{"@type":"Person","name":"Kai Zhao"},"description":""}</script><link rel="icon" href="/img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;600&amp;family=Roboto+Mono"><link rel="stylesheet" href="/css/cyberpunk.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.2.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="Hexo" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><div class="card-content"><nav class="breadcrumb" aria-label="breadcrumbs"><ul><li><a href="/tags">Tags</a></li><li class="is-active"><a href="#" aria-current="page">Rasterization</a></li></ul></nav></div></div><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2020-12-11T04:13:31.000Z" title="2020-12-11T04:13:31.000Z">2020-12-11</time></span><span class="level-item">Updated&nbsp;<time dateTime="2020-12-11T09:25:59.444Z" title="2020-12-11T09:25:59.444Z">2020-12-11</time></span><span class="level-item"><a class="link-muted" href="/categories/Computer-Graphics/">Computer Graphics</a></span></div></div><h1 class="title is-3 is-size-4-mobile"><a class="link-muted" href="/2020/12/11/Games101-Computer-Graphics-Week-5/">Games101: Computer Graphics-Week 5</a></h1><div class="content"><p>在依次进行了前面的步骤：</p>
+<ul>
+<li><p>Model transformation，将物体和摄像机放到标准位置； (M) </p>
+</li>
+<li><p>View/Camera transformation，将摄像机角度到标准位置；(V)</p>
+</li>
+<li><p>Projection Transformation，将被观测场景投影到标准的$[-1, 1]^{3}$范围后；(P)</p>
+</li>
+</ul>
+<p>After <strong>MVP</strong> transformation，下一步就是将Projection画在<strong>屏幕</strong>上，这一步就是<strong>Rasterization(光栅化)</strong> ！</p>
+<h3 id="Rasterization"><a href="#Rasterization" class="headerlink" title="Rasterization"></a>Rasterization</h3><h4 id="Preview"><a href="#Preview" class="headerlink" title="Preview"></a>Preview</h4><div style="text-align:center">
+  <img src="/images/Games101-Computer-Graphics-Week-5/image-20201211135914905.png" alt="image-20201211135914905" width="40%" height="40%"/>
+</div>
+
+<p>回顾上节课的定义，定义一个立方体需要知道：$x$轴上$[l,r]$，$y$轴上$[b, t]$，$-z$轴上$[f, n]$，这里假设我们已经知道$f$和$n$平面，对于Perspetive Projection而言，需要定义<strong>视角锥</strong>。如下图所示，定义<strong>近平面需要两要素</strong>：</p>
+<ol>
+<li>Field-of-view(fovY，默认是垂直视角)：定义为两条横边中点的连线夹角，如图中两条红色虚线所示；</li>
+<li>Aspect ratio(宽高比)： $Aspect ratio = width/height$；</li>
+</ol>
+<blockquote>
+<ul>
+<li>类似垂直视角，可以定义水平视角，此时为两条竖边的中点，并且当固定了宽高比和Fov后，即可求出水平视角。</li>
+<li>用相机类比，Fov可以对应镜头的焦距所对应的视角；</li>
+</ul>
+</blockquote>
+<h4 id="Canonical-Cube-to-Screen"><a href="#Canonical-Cube-to-Screen" class="headerlink" title="Canonical Cube to Screen"></a>Canonical Cube to Screen</h4><div style="text-align:center">
+  <img src="/images/Games101-Computer-Graphics-Week-5/image-20201211144141553.png" alt="image-20201211135914905" width="40%" height="40%"/>
+</div>
+
+<blockquote>
+<ul>
+<li>暂时不管$z$轴；</li>
+<li>将MVP变换后的$[-1,1]^{2}$映射到$[0,width]\times[0,height]$尺寸上；</li>
+<li>如何实现？先scale再translate；</li>
+</ul>
+</blockquote>
+<p>注意在上述操作中，这些操作都是对空间中的各种立方体操作的，如何将这些立方体打散到每个像素点，求解到每个像素点像素值，这个过程称为光栅化。</p>
+<h4 id="Different-raster-displays-光栅显示设备"><a href="#Different-raster-displays-光栅显示设备" class="headerlink" title="Different raster displays(光栅显示设备)"></a>Different raster displays(光栅显示设备)</h4><ul>
+<li>Oscilloscope(示波器)，显示原理和早期显示器一致，阴极射线管发生电子打到荧光屏上，CRT(Cathode Ray Tube)，以扫描的形式进行画图呈像；</li>
+<li>Frame Buffer，现在显示认为就是内存或显存中的一部分空间，屏幕就是讲内存中的内容映射显示到物理设备上，包括：<ul>
+<li>LCD(Liquid Crystal Display，液晶显示器)，利用液晶材料的极化作用，进行光线的扭转；</li>
+<li>LED(Light Emitting Diode，发光二极管)；</li>
+<li>Electronic Ink Display，电子墨水屏，刷新率很低；</li>
+</ul>
+</li>
+</ul>
+<h4 id="Triangles-Fundamental-Shape-Primitives"><a href="#Triangles-Fundamental-Shape-Primitives" class="headerlink" title="Triangles - Fundamental Shape Primitives"></a>Triangles - Fundamental Shape Primitives</h4><div style="text-align:center">
+  <img src="/images/Games101-Computer-Graphics-Week-5/image-20201211163406388.png" alt="image-20201211135914905" width="40%" height="40%"/>
+</div>
+
+<blockquote>
+<p>重心坐标插值-barycentric interpolation</p>
+</blockquote>
+<h4 id="Rasterizing-a-triangle"><a href="#Rasterizing-a-triangle" class="headerlink" title="Rasterizing a triangle"></a>Rasterizing a triangle</h4><p>光栅化最核心的步骤：</p>
+<div style="text-align:center">
+  <img src="/images/Games101-Computer-Graphics-Week-5/image-20201211164409416.png" alt="image-20201211135914905" width="40%" height="40%"/>
+</div>
+
+<blockquote>
+<p>左图三角形代表经过MVP，Projection变换后的图形，图中每一个方格代表一个<strong>像素</strong>，光栅化就是判断每一个点和三角形的关系并进行取值。</p>
+</blockquote>
+<p>下面介绍一个最简单和最广泛使用的方法-**采样(Sample)**：</p>
+<div style="text-align:center">
+  <img src="/images/Games101-Computer-Graphics-Week-5/image-20201211171149061.png" alt="image-20201211135914905" width="40%" height="40%"/>
+</div>
+
+<p>前提：</p>
+<ul>
+<li>认为每个像素内部是不可分割，颜色一致的小块；</li>
+<li>认为每个像素块的中心是$(x+0.5, y+0.5)$，由质心确定对应像素块的颜色；</li>
+</ul>
+<p>这里用代码更容易说清楚：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> x=<span class="number">0</span>; x&lt;xmax; ++x)</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> y=<span class="number">0</span>; y&lt;ymax; ++y)</span><br><span class="line">    <span class="comment">// 这里的inside函数用以判断点是否在图形内侧，算法可参考前面的固定方向叉乘</span></span><br><span class="line">    image[x][y] = inside(tri, x+<span class="number">0.5</span>, y+<span class="number">0.5</span>);</span><br></pre></td></tr></table></figure>
+
+</div></article></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="/images/avatar.jpeg" alt="Kai Zhao"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Kai Zhao</p><p class="is-size-6 is-block">Image Algorithm Engineer</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>Peking, China</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">Posts</p><a href="/archives"><p class="title">7</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Categories</p><a href="/categories"><p class="title">2</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Tags</p><a href="/tags"><p class="title">5</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/k-zha14" target="_blank" rel="noopener">Follow</a></div><div class="level is-mobile"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/k-zha14"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="/"><i class="fas fa-rss"></i></a></div></div></div><!--!--><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">Links</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://hexo.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Hexo</span></span><span class="level-right"><span class="level-item tag">hexo.io</span></span></a></li><li><a class="level is-mobile" href="https://bulma.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Bulma</span></span><span class="level-right"><span class="level-item tag">bulma.io</span></span></a></li><li><a class="level is-mobile" href="https://dwhou.github.io/" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">DWHou</span></span><span class="level-right"><span class="level-item tag">dwhou.github.io</span></span></a></li></ul></div></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">Categories</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Computer-Graphics/"><span class="level-start"><span class="level-item">Computer Graphics</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="/categories/Hexo/"><span class="level-start"><span class="level-item">Hexo</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">Tags</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/Computer-Graphics/"><span class="tag">Computer Graphics</span><span class="tag">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Linear-algebra/"><span class="tag">Linear algebra</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Rasterization/"><span class="tag">Rasterization</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Summary/"><span class="tag">Summary</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Transformations/"><span class="tag">Transformations</span><span class="tag">2</span></a></div></div></div></div></div><div class="card widget" data-type="subscribe-email"><div class="card-content"><div class="menu"><h3 class="menu-label">Subscribe for updates</h3><form action="https://feedburner.google.com/fb/a/mailverify" method="post" target="popupwindow" onsubmit="window.open(&#039;https://feedburner.google.com/fb/a/mailverify?uri=&#039;,&#039;popupwindow&#039;,&#039;scrollbars=yes,width=550,height=520&#039;);return true"><input type="hidden" value="" name="uri"><input type="hidden" name="loc" value="en_US"><div class="field has-addons"><div class="control has-icons-left is-expanded"><input class="input" name="email" type="email" placeholder="Email"><span class="icon is-small is-left"><i class="fas fa-envelope"></i></span></div><div class="control"><input class="button" type="submit" value="Subscribe"></div></div></form></div></div></div><div class="card widget"><div class="card-content"><div class="notification is-danger">You need to set <code>client_id</code> and <code>slot_id</code> to show this AD unit. Please set it in <code>_config.yml</code>.</div></div></div><div class="column-right-shadow is-hidden-widescreen"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3"><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">Recents</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-12-11T04:13:31.000Z">2020-12-11</time></p><p class="title"><a href="/2020/12/11/Games101-Computer-Graphics-Week-5/">Games101: Computer Graphics-Week 5</a></p><p class="categories"><a href="/categories/Computer-Graphics/">Computer Graphics</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-12-10T06:51:49.000Z">2020-12-10</time></p><p class="title"><a href="/2020/12/10/Games101-Computer-Graphics-Week-4/">Games101: Computer Graphics-Week 4</a></p><p class="categories"><a href="/categories/Computer-Graphics/">Computer Graphics</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-12-09T08:03:45.000Z">2020-12-09</time></p><p class="title"><a href="/2020/12/09/Games101-Computer-Graphics-Week-3/">Games101: Computer Graphics-Week 3</a></p><p class="categories"><a href="/categories/Computer-Graphics/">Computer Graphics</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-12-02T13:31:42.000Z">2020-12-02</time></p><p class="title"><a href="/2020/12/02/Games101-Computer-Graphics-Week-2/">Games101: Computer Graphics-Week 2</a></p><p class="categories"><a href="/categories/Computer-Graphics/">Computer Graphics</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-12-02T13:28:53.000Z">2020-12-02</time></p><p class="title"><a href="/2020/12/02/Games101-Computer-Graphics-Week-1/">Games101: Computer Graphics-Week 1</a></p><p class="categories"><a href="/categories/Computer-Graphics/">Computer Graphics</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">Archives</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2020/12/"><span class="level-start"><span class="level-item">December 2020</span></span><span class="level-end"><span class="level-item tag">7</span></span></a></li></ul></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="Hexo" height="28"></a><p class="is-size-7"><span>&copy; 2020 Kai Zhao</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" async></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/x-mathjax-config">MathJax.Hub.Config({
+            'HTML-CSS': {
+                matchFontHeight: false
+            },
+            SVG: {
+                matchFontHeight: false
+            },
+            CommonHTML: {
+                matchFontHeight: false
+            },
+            tex2jax: {
+                inlineMath: [
+                    ['$','$'],
+                    ['\\(','\\)']
+                ]
+            }
+        });</script><script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script></body></html>
